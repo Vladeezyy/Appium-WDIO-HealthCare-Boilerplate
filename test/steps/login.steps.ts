@@ -1,0 +1,213 @@
+import AllureReporter from '@wdio/allure-reporter';
+import loginPage from '@pages/login.page';
+import landingPage from '@pages/landing.page';
+import pinPadPage from '@pages/prompts/pinPad.page';
+import createPinPage from '@pages/prompts/createPin.page';
+import notificationsPage from '@pages/permissions/notifications.page';
+import geolocationPage from '@pages/permissions/geolocation.page';
+import permissionsAlert from '@pages/components/permissions.alert';
+import readyToPickUpShiftsPage from '@pages/prompts/readyToPickUpShifts.page';
+import confirmPhoneNumberPopup from '@pages/popups/confirmPhoneNumber.popup';
+import uploadCOVIDvaccinationPopup from '@pages/popups/uploadCOVIDvaccination.popup';
+import filtersAppliedMessagePopup from '@pages/popups/filtersAppliedMessage.popup';
+import welcomeUserPage from '@pages/prompts/welcomeUser.page';
+import pageControlsComponent from '@pages/components/pageControls.component';
+import { ENTER_KEY } from '@fixtures/constants';
+import plannedMaintenancePopup from '@pages/popups/plannedMaintenance.popup';
+import newContactInfoPage from '@pages/prompts/newContactInfo.page';
+import searchShiftsSteps from '@steps/searchShifts.steps';
+
+class LoginSteps {
+    async goThroughLoginProcess(envUrl: string, email: string, password: string, pin: string) {
+        AllureReporter.startStep('Landing Page');
+        AllureReporter.startStep('Click on "Login" btn');
+        await (await landingPage.btnLogin).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Login Page');
+        await loginPage.setCustomEnv(envUrl);
+        AllureReporter.startStep('Enter email and password and click "Log In" btn');
+        await (await loginPage.inputEmail).setValue(email);
+        await (await loginPage.inputPwd).setValue(password);
+        await (await loginPage.inputPwd).sendKeys([ENTER_KEY]);
+        await (await loginPage.btnLogIn).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('PinPad Page');
+        await createPinPage.clickBtnContinueWhenDisplayed();
+        await pinPadPage.enterPin(pin);
+        await expect((await pinPadPage.headerPinPad.getText()).toLowerCase()).toEqual('confirm pin code');
+        await pinPadPage.enterPin(pin);
+        AllureReporter.endStep();
+    }
+    async logOnAsActiveWithReqTrainings(envUrl: string, email: string, password: string, pin: string) {
+        AllureReporter.startStep('Landing Page');
+        AllureReporter.startStep('Click on "Login" btn');
+        await (await landingPage.btnLogin).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Login Page');
+        await loginPage.setCustomEnv(envUrl);
+        await loginPage.login(email, password);
+        AllureReporter.endStep();
+        await plannedMaintenancePopup.clickBtnCloseIfDisplayed(3);
+        AllureReporter.startStep('PinPad Page');
+        await plannedMaintenancePopup.clickBtnCloseIfDisplayed(3);
+        await newContactInfoPage.closeNewContactInfoPromptIfDisplayed(3);
+        await createPinPage.clickBtnContinueWhenDisplayed();
+        await pinPadPage.enterPin(pin);
+        await pinPadPage.enterPin(pin);
+        AllureReporter.endStep();
+        AllureReporter.startStep('Notifications Page');
+        AllureReporter.startStep(`Click "Yes notify me" button`);
+        await (await notificationsPage.btnConfirm).click();
+        await permissionsAlert.notifications('Allow');
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Geolocation Page');
+        AllureReporter.startStep('Click "Yes, enable geolocation" button');
+        await (await geolocationPage.btnConfirm).click();
+        AllureReporter.endStep();
+        await permissionsAlert.location('Allow');
+        AllureReporter.endStep();
+        await readyToPickUpShiftsPage.clickBtnExploreShiftsIfDisplayed();
+        AllureReporter.startStep('Explore Page');
+        await confirmPhoneNumberPopup.confirmPhoneNumberIfDisplayed();
+        await uploadCOVIDvaccinationPopup.clickBtnOKifDisplayed();
+        await confirmPhoneNumberPopup.clickImgPhoneNumberConfirmedIfDisplayed();
+        await uploadCOVIDvaccinationPopup.clickBtnOKifDisplayed();
+        await filtersAppliedMessagePopup.clickBtnGotItIfDisplayed();
+        AllureReporter.endStep();
+    }
+    async logOnAsActive(envUrl: string, email: string, password: string, pin: string) {
+        AllureReporter.startStep('Landing Page');
+        AllureReporter.startStep('Click on "Login" btn');
+        await (await landingPage.btnLogin).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Login Page');
+        await loginPage.setCustomEnv(envUrl);
+        await loginPage.login(email, password);
+        AllureReporter.endStep();
+        AllureReporter.startStep('PinPad Page');
+        await (await createPinPage.btnContinue).waitForDisplayed({ timeout: 10 * 1000 });
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePageRightSide, 8000);
+        await (await createPinPage.btnContinue).click();
+        await pinPadPage.enterPin(pin);
+        await pinPadPage.enterPin(pin);
+        AllureReporter.endStep();
+        AllureReporter.startStep('Welcome Page');
+        AllureReporter.startStep(`Close Welcome Page & Video`);
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePage);
+        await driver.pause(2000); //doesnt work without it =(
+        await welcomeUserPage.clickIfDisplayed(await welcomeUserPage.btnSkipVideo);
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePage);
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Notifications Page');
+        AllureReporter.startStep(`Click "Yes notify me" button`);
+        await (await notificationsPage.btnConfirm).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Geolocation Page');
+        AllureReporter.startStep('Click "Yes, enable geolocation" button');
+        await (await geolocationPage.btnConfirm).click();
+        AllureReporter.endStep();
+        await permissionsAlert.location('Allow');
+        AllureReporter.endStep();
+        AllureReporter.startStep('Explore Page');
+        const isPhoneConfirmed = await confirmPhoneNumberPopup.confirmPhoneNumberIfDisplayed(5000);
+        const isCovidPopupClosed = await uploadCOVIDvaccinationPopup.clickBtnOKifDisplayed();
+        if (!isPhoneConfirmed) {
+            await searchShiftsSteps.resetSearchFilterIfNotDefault(true);
+            if (!isCovidPopupClosed) await uploadCOVIDvaccinationPopup.clickBtnOKifDisplayed();
+            await confirmPhoneNumberPopup.confirmPhoneNumberIfDisplayed(5000);
+        }
+        AllureReporter.endStep();
+        await confirmPhoneNumberPopup.clickImgPhoneNumberConfirmedIfDisplayed();
+        AllureReporter.endStep();
+        await filtersAppliedMessagePopup.clickBtnGotItIfDisplayed();
+    }
+    async logInAsActiveWithReqTrainings(envUrl: string, email: string, password: string, pin: string) {
+        AllureReporter.startStep('Landing Page');
+        AllureReporter.startStep('Click on "Login" btn');
+        await (await landingPage.btnLogin).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Login Page');
+        await loginPage.setCustomEnv(envUrl);
+        await loginPage.login(email, password);
+        AllureReporter.endStep();
+        AllureReporter.startStep('PinPad Page');
+        await createPinPage.clickBtnContinueWhenDisplayed();
+        await pinPadPage.enterPin(pin);
+        await pinPadPage.enterPin(pin);
+        AllureReporter.endStep();
+        AllureReporter.startStep('Notifications Page');
+        AllureReporter.startStep(`Click "Yes notify me" button`);
+        await (await notificationsPage.btnConfirm).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Geolocation Page');
+        AllureReporter.startStep('Click "Yes, enable geolocation" button');
+        await (await geolocationPage.btnConfirm).click();
+        AllureReporter.endStep();
+        await permissionsAlert.location('Allow');
+        AllureReporter.endStep();
+        AllureReporter.startStep('Explore Page');
+        await confirmPhoneNumberPopup.confirmPhoneNumberIfDisplayed();
+        AllureReporter.endStep();
+    }
+    async logOnAsActiveWithoutCovidDocs(envUrl: string, email: string, password: string, pin: string) {
+        AllureReporter.startStep('Landing Page');
+        AllureReporter.startStep('Click on "Login" btn');
+        await (await landingPage.btnLogin).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Login Page');
+        await loginPage.setCustomEnv(envUrl);
+        await loginPage.login(email, password);
+        AllureReporter.endStep();
+        AllureReporter.startStep('PinPad Page');
+        await (await createPinPage.btnContinue).waitForDisplayed({ timeout: 10 * 1000 });
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePageRightSide, 8000);
+        await (await createPinPage.btnContinue).click();
+        await pinPadPage.enterPin(pin);
+        await pinPadPage.enterPin(pin);
+        AllureReporter.endStep();
+        AllureReporter.startStep('Welcome Page');
+        AllureReporter.startStep(`Close Welcome Page & Video`);
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePage);
+        await driver.pause(2000); //doesnt work without it =(
+        await welcomeUserPage.clickIfDisplayed(await welcomeUserPage.btnSkipVideo);
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePage);
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Notifications Page');
+        AllureReporter.startStep(`Click "Yes notify me" button`);
+        await (await notificationsPage.btnConfirm).click();
+        AllureReporter.endStep();
+        AllureReporter.endStep();
+        AllureReporter.startStep('Geolocation Page');
+        AllureReporter.startStep('Click "Yes, enable geolocation" button');
+        await (await geolocationPage.btnConfirm).click();
+        AllureReporter.endStep();
+        await permissionsAlert.location('Allow');
+        await pageControlsComponent.clickIfDisplayed(await pageControlsComponent.btnClosePage);
+        AllureReporter.endStep();
+        AllureReporter.startStep('Explore Page');
+        const isPhoneConfirmed = await confirmPhoneNumberPopup.confirmPhoneNumberIfDisplayed(5000);
+        const isCovidPopupClosed = await uploadCOVIDvaccinationPopup.clickBtnOKifDisplayed();
+        if (!isPhoneConfirmed) {
+            await searchShiftsSteps.resetSearchFilterIfNotDefault(true);
+            if (!isCovidPopupClosed) await uploadCOVIDvaccinationPopup.clickBtnOKifDisplayed();
+            await confirmPhoneNumberPopup.confirmPhoneNumberIfDisplayed(5000);
+        }
+        AllureReporter.endStep();
+        await confirmPhoneNumberPopup.clickImgPhoneNumberConfirmedIfDisplayed();
+        AllureReporter.endStep();
+        await filtersAppliedMessagePopup.clickBtnGotItIfDisplayed();
+    }
+}
+
+export default new LoginSteps();

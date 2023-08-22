@@ -1,0 +1,82 @@
+{
+    "name": "e2e-tests",
+    "scripts": {
+        "test:sauce:both:os:rdc": "npx wdio run ./config/sauce/wdio.sauce.both.os.rdc.conf.ts",
+        "test:sauce:both:os:emulator": "env CREATE_FACILITIES=false DELETE_SHIFTS=true npx wdio run ./config/sauce/wdio.sauce.both.os.emulator.conf.ts",
+        "test:sauce:android:rdc": "npx wdio run ./config/sauce/wdio.sauce.android.rdc.conf.ts",
+        "test:sauce:android:emulator": "env CREATE_FACILITIES=true DELETE_SHIFTS=true npx wdio run ./config/sauce/wdio.sauce.android.emulator.conf.ts --suite shiftAccept",
+        "test:sauce:ios:rdc": "npx wdio run ./config/sauce/wdio.sauce.ios.rdc.conf.ts",
+        "test:sauce:ios:emulator": "npx wdio run ./config/sauce/wdio.sauce.ios.emulator.conf.ts",
+        "test:appium:android": "env CREATE_FACILITIES=true DELETE_SHIFTS=true npx wdio run ./config/appium/wdio.appium.android.conf.ts --spec test/specs/exploreScreen/openShifts/shiftAccept/AcceptShiftCNA.e2e.ts",
+        "test:appium:android:suite": "env CREATE_FACILITIES=false DELETE_SHIFTS=true npx wdio run ./config/appium/wdio.appium.android.conf.ts --suite ShiftAccept",
+        "test:appium:ios": "npx wdio run ./config/appium/wdio.appium.ios.conf.ts",
+        "report:allure:generate": "npx allure generate ./reports/allure-results --report-dir ./reports/allure-report --clean",
+        "report:allure:open": "npx allure open ./reports/allure-report",
+        "report:allure:clean": "rm -r -f reports/allure-results reports/allure-report",
+        "app:download:android": "env BUILD_NAME=latest OS=android bash ./scripts/download_app_from_sauce.sh",
+        "app:download:ios": "env BUILD_NAME=latest OS=ios bash ./scripts/download_app_from_sauce.sh",
+        "app:get:android": "env BUILD_NAME=latest OS=android bash ./scripts/get_app_from_sauce.sh",
+        "app:get:ios": "env BUILD_NAME=latest OS=ios bash ./scripts/get_app_from_sauce.sh",
+        "app:clean": "rm -r -f app"
+    },
+    "devDependencies": {
+        "@wdio/allure-reporter": "^7.27.0",
+        "@wdio/appium-service": "^7.27.0",
+        "@wdio/cli": "^7.27.0",
+        "@wdio/local-runner": "^7.27.0",
+        "@wdio/mocha-framework": "^7.26.0",
+        "@wdio/sauce-service": "^7.27.0",
+        "@wdio/spec-reporter": "^7.27.0",
+        "@wdio/types": "^7.26.0",
+        "allure-commandline": "^2.18.1",
+        "appium": "^1.22.3",
+        "axios": "^0.27.2",
+        "dotenv": "^16.0.3",
+        "moment": "^2.29.4",
+        "moment-timezone": "^0.5.41",
+        "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.1.1",
+        "typescript": "^4.9.3"
+    },
+    "optionalDependencies": {
+        "@typescript-eslint/eslint-plugin": "^5.41.0",
+        "@typescript-eslint/parser": "^5.41.0",
+        "eslint": "^8.26.0",
+        "eslint-plugin-wdio": "^7.25.3"
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "tabWidth": 4,
+        "printWidth": 120,
+        "semi": true,
+        "singleQuote": true
+    },
+    "eslintConfig": {
+        "extends": [
+            "eslint:recommended",
+            "plugin:@typescript-eslint/recommended",
+            "plugin:wdio/recommended"
+        ],
+        "parser": "@typescript-eslint/parser",
+        "parserOptions": {
+            "tsconfigRootDir": "./",
+            "project": [
+                "./tsconfig.json"
+            ]
+        },
+        "rules": {
+            "@typescript-eslint/no-explicit-any": "off"
+        },
+        "plugins": [
+            "@typescript-eslint",
+            "wdio"
+        ],
+        "root": true
+    },
+    "dependencies": {
+        "@wdio/junit-reporter": "^7.30.2",
+        "dateformat": "^5.0.3",
+        "nodemailer": "^6.9.1",
+        "xml2json": "^0.12.0"
+    }
+}

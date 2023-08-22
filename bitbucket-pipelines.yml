@@ -1,0 +1,53 @@
+image: atools/chrome-headless:java11-node14-latest
+
+definitions:
+    commonItems: &get_app_version echo $BUILD_NAME_IOS &&
+        echo $BUILD_NAME_ANDROID &&
+        export BUILD_NAME_IOS=$(env BUILD_NAME=$BUILD_NAME_IOS OS=ios bash ./scripts/get_app_from_sauce.sh | grep BUILD_NAME | cut -d= -f2-) &&
+        export BUILD_NAME_ANDROID=$(env BUILD_NAME=$BUILD_NAME_ANDROID OS=android bash ./scripts/get_app_from_sauce.sh | grep BUILD_NAME | cut -d= -f2- ) &&
+        echo $BUILD_NAME_IOS &&
+        echo $BUILD_NAME_ANDROID
+pipelines:
+    pull-requests:
+        '**': #this runs as default for any branch not elsewhere defined
+            - step:
+                  name: Run Automation & Generate Report
+                  caches:
+                      - node
+                  script:
+                      #! change it to the preferred version that you want to use for the pull request
+                      - export BUILD_NAME_IOS=latest # BUILD_NAME_IOS=Payload-xxx.ipa or latest
+                      - export BUILD_NAME_ANDROID=latest # BUILD_NAME_ANDROID=app-debug-xxx.apk or latest
+                      - *get_app_version
+                      - npm ci --no-optional
+                      # change this script to launch your ticket tests after pull request
+                      - env CREATE_FACILITIES=true DELETE_SHIFTS=true npx wdio run ./config/sauce/wdio.sauce.android.emulator.conf.ts --suite ShiftAccept
+                  after-script:
+                      - npm run report:allure:generate
+                  artifacts:
+                      - reports/allure-results/**
+                      - reports/allure-report/**
+                      - reports/test-results/**
+    custom:
+        run_aut_on_specific_version:
+            - variables:
+                  - name: BUILD_NAME_IOS
+                    default: 'latest'
+                  - name: BUILD_NAME_ANDROID
+                    default: 'latest'
+                  - name: AUT
+                    default: 'dev.qa.automation3'
+            - step:
+                  name: Run Automation & Generate Report
+                  caches:
+                      - node
+                  script:
+                      - *get_app_version
+                      - npm ci --no-optional
+                      - env CREATE_FACILITIES=true DELETE_SHIFTS=true npx wdio run ./config/sauce/wdio.sauce.android.emulator.conf.ts --suite ShiftAccept
+                  after-script:
+                      - npm run report:allure:generate
+                  artifacts:
+                      - reports/allure-results/**
+                      - reports/allure-report/**
+                      - reports/test-results/**

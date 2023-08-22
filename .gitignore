@@ -1,0 +1,41 @@
+# Visual Studio Code 
+.vscode
+yarn.lock
+
+# Environment variables
+.env
+
+# Apps
+app/*.ipa
+app/*.apk
+
+# WDIO report files
+reports/
+results/
+.idea/
+
+# Workspace
+workspace/
+
+# Node artifact files
+node_modules/
+dist/
+
+# Log files
+*.log
+
+# Package files
+*.jar
+
+# Unit test reports
+TEST*.xml
+
+# Large media files
+*.mp4
+*.tiff
+*.avi
+*.flv
+*.mov
+*.wmv
+
+

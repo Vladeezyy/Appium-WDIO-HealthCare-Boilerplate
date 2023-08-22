@@ -1,0 +1,30 @@
+{
+    "type": "module",
+    "compilerOptions": {
+        "sourceMap": true,
+        "strictNullChecks": false,
+        "lib": ["ES2022"],
+        "types": ["node", "webdriverio/async", "@wdio/mocha-framework", "expect-webdriverio"],
+        "target": "ES2022",
+        "esModuleInterop": true,
+        "module": "CommonJS",
+        "resolveJsonModule": true,
+        "moduleResolution": "Node",
+        "baseUrl": "./",
+        "paths": {
+            "@helpers/*": ["test/helpers/*"],
+            "@pages/*": ["test/pages/*"],
+            "@steps/*": ["test/steps/*"],
+            "@api/*": ["api/*"],
+            "@fixtures/*": ["fixtures/*"],
+            "@tests/*": ["test/specs/*"],
+            "@config/*": ["config/*"],
+            "@utils/*": ["utils/*"],
+            "@environment/*": ["environment/*"]
+        }
+    },
+    "exclude": ["./jest"],
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    }
+}
